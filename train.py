@@ -11,7 +11,8 @@ import glob
 epochs = 50
 batch_size = 1
 input_size, model = get_unet_128()
-model.load_weights(filepath='weights/best_weights.hdf5')
+
+#model.load_weights(filepath='weights/best_weights.hdf5') # For resuming train
 
 train_img_path_template = 'input/train/{}.jpg'
 train_img_mask_path_template = 'input/train/{}_mask.png'
