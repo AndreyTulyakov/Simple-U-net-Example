@@ -1,6 +1,6 @@
 # Simple-U-net-Example
 
-Full example with implementation of U-Net image segmantation neural network.
+Full example with implementation of U-Net image segmentation neural network.
 
 Usage steps:
 - Compilate input images or use example data
