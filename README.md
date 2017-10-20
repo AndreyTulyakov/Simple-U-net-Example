@@ -9,5 +9,5 @@ Usage steps:
 
 
 ## Test
-![](https://github.com/mhyhre/Simple-U-net-Example/blob/master/input/test/00d3de919651_11.jpg)
-![](https://github.com/mhyhre/Simple-U-net-Example/blob/master/output/00d3de919651_11.png)
+![](https://github.com/mhyhre/Simple-U-net-Example/blob/master/input/test/IMG_20171020_130727.jpg)
+![](https://github.com/mhyhre/Simple-U-net-Example/blob/master/input/test/segmentation/IMG_20171020_130727.png)

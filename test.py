@@ -7,10 +7,13 @@ from augmentators import randomHueSaturationValue, randomHorizontalFlip, randomS
 from u_net import get_unet_128
 import glob
 
-orig_width = 320
-orig_height = 240
+orig_width = 240
+orig_height = 320
 
-epochs = 50
+threshold = 0.5
+
+
+epochs = 10
 batch_size = 1
 input_size, model = get_unet_128()
 model.load_weights(filepath='weights/best_weights.hdf5')
@@ -36,9 +39,9 @@ for start in tqdm(range(0, len(test_filenames), batch_size)):
     preds = model.predict_on_batch(x_batch)
     preds = np.squeeze(preds, axis=3)
     for index, pred in enumerate(preds):
-        print(preds)
-        prob = cv2.resize(pred, (orig_width, orig_height)) * 255
+        prob = np.array(cv2.resize(pred, (orig_width, orig_height)) > threshold).astype(np.float32) * 255
         current_filename = ids_test_batch[index]
-        cv2.imwrite('output/{}.png'.format(id), prob)
+        cv2.imwrite('input/test/segmentation/{}.png'.format(id), prob)
+        
 
 print("Done!")

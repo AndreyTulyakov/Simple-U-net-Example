@@ -8,20 +8,19 @@ from u_net import get_unet_128
 import glob
 
 
-epochs = 50
+epochs = 200
 batch_size = 1
 input_size, model = get_unet_128()
-
-#model.load_weights(filepath='weights/best_weights.hdf5') # For resuming train
+model.load_weights(filepath='weights/best_weights.hdf5') # For resuming train
 
 train_img_path_template = 'input/train/{}.jpg'
-train_img_mask_path_template = 'input/train/{}_mask.png'
+train_img_mask_path_template = 'input/train/segmentation/{}.png'
 
 train_filenames = glob.glob("input/train/*.jpg")
 train_filenames = [filename.replace('\\','/').replace('.jpg', '') for filename in train_filenames]
 train_filenames = [filename.split('/')[-1] for filename in train_filenames]
 
-train_split, valid_split = train_test_split(train_filenames, test_size=0.20, random_state=42)
+train_split, valid_split = train_test_split(train_filenames, test_size=0.10, random_state=42)
 
 print('Training on {} samples'.format(len(train_split)))
 print('Validating on {} samples'.format(len(valid_split)))
@@ -29,6 +28,8 @@ print('Validating on {} samples'.format(len(valid_split)))
 
 def train_generator():
     while True:
+        train_split, valid_split = train_test_split(train_filenames, test_size=0.10, random_state=42)
+
         for start in range(0, len(train_split), batch_size):
             x_batch = []
             y_batch = []
@@ -45,7 +46,7 @@ def train_generator():
                                                val_shift_limit=(-15, 15))
                 img, mask = randomShiftScaleRotate(img, mask,
                                                    shift_limit=(-0.25, 0.25),
-                                                   scale_limit=(-0.5, 0.5),
+                                                   scale_limit=(-0.3, 0.3),
                                                    rotate_limit=(-10, 10))
                 img, mask = randomHorizontalFlip(img, mask)
                 mask = np.expand_dims(mask, axis=2)
@@ -58,6 +59,8 @@ def train_generator():
 
 def valid_generator():
     while True:
+        train_split, valid_split = train_test_split(train_filenames, test_size=0.10, random_state=42)
+
         for start in range(0, len(valid_split), batch_size):
             x_batch = []
             y_batch = []
@@ -76,16 +79,17 @@ def valid_generator():
             yield x_batch, y_batch
 
 
-callbacks = [EarlyStopping(monitor='val_dice_loss',
-                           patience=8,
-                           verbose=1,
-                           min_delta=1e-4,
-                           mode='max'),
+callbacks = [
+#        EarlyStopping(monitor='val_dice_loss',
+#                           patience=8,
+#                           verbose=1,
+#                           min_delta=1e-4,
+#                           mode='max'),
              ReduceLROnPlateau(monitor='val_dice_loss',
-                               factor=0.1,
+                               factor=0.5,
                                patience=4,
                                verbose=1,
-                               epsilon=1e-4,
+                               epsilon=1e-5,
                                mode='max'),
              ModelCheckpoint(monitor='val_dice_loss',
                              filepath='weights/best_weights.hdf5',
